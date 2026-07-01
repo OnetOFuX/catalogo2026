@@ -5,7 +5,7 @@ import { SlidersHorizontal, PackageOpen, LayoutGrid, Rows } from 'lucide-react'
 
 const CATEGORIES = ['Todos', 'Inicial', 'Primaria', 'Secundaria']
 
-export default function Catalog({ products, onAddToCart, onDetailClick, searchTerm, viewMode, setViewMode }) {
+export default function Catalog({ products, onAddToCart, onDetailClick, onImageClick, searchTerm, viewMode, setViewMode }) {
   const [selectedCategory, setSelectedCategory] = useState('Todos')
   const [sortBy, setSortBy] = useState('featured')
 
@@ -115,7 +115,6 @@ export default function Catalog({ products, onAddToCart, onDetailClick, searchTe
         )}
       </div>
 
-      {/* Grid o Lista de Productos */}
       <div className={viewMode === 'grid' ? 'products-grid' : 'products-list'}>
         {filteredProducts.map((product) => (
           <ProductCard
@@ -123,6 +122,7 @@ export default function Catalog({ products, onAddToCart, onDetailClick, searchTe
             product={product}
             onAddToCart={onAddToCart}
             onDetailClick={onDetailClick}
+            onImageClick={onImageClick}
             viewMode={viewMode}
           />
         ))}

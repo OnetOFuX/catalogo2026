@@ -28,9 +28,9 @@
   --glass-blur: blur(12px);
 
   /* Fuentes Académicas y Letras Gruesas de Lujo */
-  --font-title: 'Playfair Display', serif;
-  --font-serif: 'Cormorant Garamond', serif;
-  --font-body: 'Inter', sans-serif;
+  --font-title: 'Trebuchet MS', Tahoma, Verdana, sans-serif;
+  --font-serif: 'Trebuchet MS', Tahoma, Verdana, sans-serif;
+  --font-body: 'Trebuchet MS', Tahoma, Verdana, sans-serif;
 
   /* Bordes Angular Estilo Angular Material */
   --radius-sm: 4px;
@@ -1911,5 +1911,173 @@ h1, h2, h3, h4, h5, h6 {
   color: #000000 !important;
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
   transform: translateY(-1px);
+}
+
+/* ==========================================
+   ESTILOS DE FORMULARIO DE ADMINISTRACIÓN MEJORADOS
+   ========================================== */
+
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.form-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--accent-glow), inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+textarea.form-input {
+  min-height: 90px;
+  line-height: 1.6;
+}
+
+/* Modo Edición en Formulario */
+.admin-card-box-editing {
+  background: var(--bg-secondary);
+  border: 1px solid var(--gold) !important;
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.15), var(--shadow-md);
+  position: relative;
+}
+
+.admin-card-box-editing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold), var(--gold-dark));
+}
+
+.editing-banner {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Hover de fila para que se note la interactividad en el listado */
+.admin-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(212, 175, 55, 0.03) !important;
+}
+
+/* ==========================================
+   INTERACTIVIDAD DE TARJETAS DE PRODUCTO
+   ========================================== */
+.angular-card {
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.angular-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.1);
+  border-color: var(--border-gold);
+}
+
+.angular-card-img {
+  transition: transform 0.5s ease;
+}
+
+.angular-card-media:hover .angular-card-img {
+  transform: scale(1.04);
+}
+
+/* Especificaciones / Hover cursor */
+.detail-modal-img {
+  cursor: zoom-in;
+  transition: transform 0.3s ease;
+}
+.detail-modal-img:hover {
+  transform: scale(1.02);
+}
+
+/* ==========================================
+   LIGHTBOX DE IMAGEN FULLSCREEN
+   ========================================== */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 22, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-img {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.lightbox-close-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lightbox-close-btn:hover {
+  background: var(--gold);
+  color: #000;
+  transform: scale(1.1);
 }
 

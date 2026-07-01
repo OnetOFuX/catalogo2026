@@ -2,12 +2,15 @@ import React from 'react'
 import { Plus, Eye, Award } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-export default function ProductCard({ product, onAddToCart, onDetailClick, viewMode = 'grid' }) {
+export default function ProductCard({ product, onAddToCart, onDetailClick, onImageClick, viewMode = 'grid' }) {
   const { name, description, price, category, image_url, stock } = product
   const isList = viewMode === 'list'
 
   return (
-    <div className={`angular-card ${isList ? 'angular-card-row' : ''}`}>
+    <div 
+      className={`angular-card ${isList ? 'angular-card-row' : ''}`}
+      onClick={() => onDetailClick(product)}
+    >
       
       {/* Contenedor de Imagen y Badge de Categoría */}
       <div className={`angular-card-media ${isList ? 'angular-card-media-row' : ''}`}>
@@ -25,15 +28,6 @@ export default function ProductCard({ product, onAddToCart, onDetailClick, viewM
         <span className="card-badge">
           {category}
         </span>
-
-        {/* Botón flotante para ver detalle */}
-        <button
-          onClick={() => onDetailClick(product)}
-          className="card-float-btn"
-          title="Ver detalle del cuadro"
-        >
-          <Eye size={16} />
-        </button>
 
         {/* Decorador de stock bajo */}
         {stock <= 5 && stock > 0 && (
@@ -72,7 +66,10 @@ export default function ProductCard({ product, onAddToCart, onDetailClick, viewM
           </div>
 
           <button
-            onClick={() => stock > 0 && onAddToCart(product)}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (stock > 0) onAddToCart(product)
+            }}
             disabled={stock === 0}
             className="card-btn-add"
           >

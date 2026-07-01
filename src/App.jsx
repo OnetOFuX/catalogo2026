@@ -8,7 +8,7 @@ import CartModal from './components/CartModal'
 import AdminLogin from './components/AdminLogin'
 import AdminDashboard from './components/AdminDashboard'
 import { motion, AnimatePresence } from 'framer-motion'
-import { GraduationCap, Sparkles, PhoneCall, Heart } from 'lucide-react'
+import { GraduationCap, Sparkles, PhoneCall, Heart, X } from 'lucide-react'
 
 // Productos Semilla de Respaldo por si Supabase no tiene datos o no está configurado
 const FALLBACK_PRODUCTS = []
@@ -24,6 +24,7 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [zoomImage, setZoomImage] = useState(null)
 
   // Persistencia de Carrito, Tema y Vista (Cuadrícula / Lista)
   const [cartItems, setCartItems] = useLocalStorage('promo-cart', [])
@@ -109,7 +110,8 @@ export default function App() {
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
 
       if (error) throw error
 
@@ -256,6 +258,7 @@ export default function App() {
                   searchTerm={searchTerm}
                   onAddToCart={handleAddToCart}
                   onDetailClick={(prod) => setSelectedProduct(prod)}
+                  onImageClick={setZoomImage}
                   viewMode={viewMode}
                   setViewMode={setViewMode}
                 />
@@ -317,6 +320,7 @@ export default function App() {
             product={selectedProduct}
             onClose={() => setSelectedProduct(null)}
             onAddToCart={handleAddToCart}
+            onImageClick={setZoomImage}
           />
         )}
 
@@ -328,6 +332,23 @@ export default function App() {
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}
           />
+        )}
+
+        {zoomImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="lightbox-overlay"
+            onClick={() => setZoomImage(null)}
+          >
+            <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+              <button className="lightbox-close-btn" onClick={() => setZoomImage(null)} title="Cerrar">
+                <X size={16} />
+              </button>
+              <img src={zoomImage} alt="Vista ampliada" className="lightbox-img" />
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

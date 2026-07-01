@@ -2,7 +2,7 @@ import React from 'react'
 import { X, Award, ShoppingCart, Info } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-export default function ProductDetailModal({ product, onClose, onAddToCart }) {
+export default function ProductDetailModal({ product, onClose, onAddToCart, onImageClick }) {
   if (!product) return null
 
   const { name, description, price, category, image_url, stock } = product
@@ -47,6 +47,8 @@ export default function ProductDetailModal({ product, onClose, onAddToCart }) {
               src={image_url || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&q=80&w=600'}
               alt={name}
               className="detail-modal-img"
+              onClick={() => onImageClick && image_url && onImageClick(image_url)}
+              title="Click para ver pantalla completa"
             />
           </div>
 

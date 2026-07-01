@@ -252,7 +252,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         
         {/* Formulario de CRUD */}
         <div className="admin-form-panel">
-          <div className="admin-card-box admin-card-box-accent">
+          <div className={editingProduct ? "admin-card-box-editing" : "admin-card-box admin-card-box-accent"}>
 
             <h3 className="admin-panel-title">
               <span>{editingProduct ? 'Editar Cuadro' : 'Agregar Nuevo Cuadro'}</span>
@@ -266,6 +266,18 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                 </button>
               )}
             </h3>
+
+            {editingProduct && (
+              <div className="editing-banner">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '16px' }}>✏️</span>
+                  <div>
+                    <div style={{ fontWeight: '800' }}>MODO EDICIÓN ACTIVO</div>
+                    <div style={{ fontSize: '9px', opacity: 0.8 }}>Modificando: {editingProduct.name}</div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleSaveProduct} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               
