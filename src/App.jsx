@@ -255,7 +255,7 @@ export default function App() {
                       Ver Modelos
                     </a>
                     <a
-                      href="https://wa.me/51987483430?text=Hola,%20me%20gustaría%20cotizar%20un%20cuadro%20de%20promoción."
+                      href="https://wa.me/51953200235?text=Hola,%20me%20gustaría%20cotizar%20un%20cuadro%20de%20promoción."
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-whatsapp"
