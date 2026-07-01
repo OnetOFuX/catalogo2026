@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Cuadro Clásico Vidrio Templado",
+    "description": "Marco de madera noble con vidrio templado de 4mm. Incluye grabado de nombre y colegio. Tamaño 30x40cm.",
+    "price": 120.00,
+    "category": "Primaria",
+    "stock": 25
+  },
+  {
+    "name": "Cuadro Premium Doble Vidrio",
+    "description": "Doble capa de vidrio con iluminación LED integrada. Grabado láser personalizado. Tamaño 35x45cm.",
+    "price": 180.00,
+    "category": "Secundaria",
+    "stock": 15
+  },
+  {
+    "name": "Cuadro Económico MDF",
+    "description": "Marco de MDF resistente con lámina protectora. Ideal para promociones grupales. Tamaño 25x35cm.",
+    "price": 65.00,
+    "category": "Inicial",
+    "stock": 50
+  },
+  {
+    "name": "Cuadro Luxe Enchapado en Oro",
+    "description": "Acabado enchapado dorado con cristal antirreflejante. Placa grabada con nombre completo. Tamaño 40x50cm.",
+    "price": 250.00,
+    "category": "Secundaria",
+    "stock": 10
+  },
+  {
+    "name": "Cuadro Infantil Multicolor",
+    "description": "Diseño colorido para niños. Marco de madera pintada con protector UV. Tamaño 20x30cm.",
+    "price": 85.00,
+    "category": "Inicial",
+    "stock": 30
+  }
+]

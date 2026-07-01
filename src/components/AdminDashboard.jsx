@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { supabase } from '../supabaseClient'
-import { Plus, Edit2, Trash2, Upload, Save, X, RefreshCw, AlertTriangle, ArrowLeft } from 'lucide-react'
+import { Plus, Edit2, Trash2, Upload, Save, X, RefreshCw, AlertTriangle, ArrowLeft, FileJson, Loader2, CheckCircle2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const CATEGORIES = ['Inicial', 'Primaria', 'Secundaria']
@@ -20,6 +20,12 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const [successMsg, setSuccessMsg] = useState(null)
+
+  // Estados de carga masiva por JSON
+  const [bulkData, setBulkData] = useState(null)
+  const [bulkFileName, setBulkFileName] = useState('')
+  const [bulkLoading, setBulkLoading] = useState(false)
+  const [bulkResult, setBulkResult] = useState(null)
 
   // Manejar cambio de archivo de imagen
   const handleImageChange = (e) => {
@@ -145,6 +151,62 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
     } catch (err) {
       console.error('Error deleting product:', err)
       alert('Error al eliminar el producto: ' + err.message)
+    }
+  }
+
+  // ─── Carga masiva por JSON ───
+  const handleBulkFileChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setBulkResult(null)
+    setBulkFileName(file.name)
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result)
+        const items = Array.isArray(parsed) ? parsed : parsed.products || parsed.data || [parsed]
+        setBulkData(items)
+      } catch {
+        setError('El archivo JSON no es válido. Revisa el formato.')
+        setBulkData(null)
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const handleBulkUpload = async () => {
+    if (!bulkData || bulkData.length === 0) return
+    setBulkLoading(true)
+    setError(null)
+    setBulkResult(null)
+
+    try {
+      const rows = bulkData.map((item) => ({
+        name: item.name || item.title || 'Sin nombre',
+        description: item.description || '',
+        price: parseFloat(item.price) || 0,
+        category: item.category || 'Inicial',
+        image_url: item.image_url || item.imageUrl || null,
+        stock: parseInt(item.stock) || 10,
+      }))
+
+      const { data, error: insertErr } = await supabase
+        .from('products')
+        .insert(rows)
+        .select()
+
+      if (insertErr) throw insertErr
+
+      setBulkResult({ success: true, count: rows.length })
+      setBulkData(null)
+      setBulkFileName('')
+      onRefreshProducts()
+    } catch (err) {
+      console.error('Bulk upload error:', err)
+      setError('Error al subir productos: ' + (err.message || 'Intenta de nuevo.'))
+      setBulkResult({ success: false })
+    } finally {
+      setBulkLoading(false)
     }
   }
 
@@ -331,6 +393,83 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
 
             </form>
           </div>
+
+          {/* ── Sección Carga Masiva JSON ── */}
+          <div className="admin-card-box" style={{ marginTop: '20px' }}>
+            <h3 className="admin-panel-title">
+              <span><FileJson size={14} style={{ marginRight: '6px', verticalAlign: '-2px' }} />Carga Masiva por JSON</span>
+            </h3>
+
+            <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '14px', lineHeight: 1.6 }}>
+              Sube un archivo <strong>.json</strong> con un arreglo de productos para agregarlos al catálogo de una sola vez. Las imágenes se pueden editar después.
+            </p>
+
+            {/* Input de archivo */}
+            <div className="file-upload-container">
+              <label className="file-upload-label">
+                <div className="file-upload-icon-text">
+                  <FileJson size={16} />
+                  <span>{bulkFileName || 'Seleccionar archivo JSON'}</span>
+                </div>
+                <input
+                  type="file"
+                  accept=".json,application/json"
+                  style={{ display: 'none' }}
+                  onChange={handleBulkFileChange}
+                />
+              </label>
+            </div>
+
+            {/* Vista previa de datos */}
+            {bulkData && bulkData.length > 0 && (
+              <div className="bulk-preview">
+                <div className="bulk-preview-header">
+                  <span>📦 {bulkData.length} producto{bulkData.length > 1 ? 's' : ''} detectado{bulkData.length > 1 ? 's' : ''}</span>
+                  <button
+                    className="back-btn"
+                    onClick={() => { setBulkData(null); setBulkFileName(''); setBulkResult(null) }}
+                  >
+                    <X size={12} /> Cancelar
+                  </button>
+                </div>
+                <div className="bulk-preview-list">
+                  {bulkData.slice(0, 8).map((item, i) => (
+                    <div key={i} className="bulk-preview-item">
+                      <span className="bulk-preview-name">{item.name || item.title || 'Sin nombre'}</span>
+                      <span className="bulk-preview-price">S/. {parseFloat(item.price || 0).toFixed(2)}</span>
+                      <span className="admin-table-badge">{item.category || 'Inicial'}</span>
+                    </div>
+                  ))}
+                  {bulkData.length > 8 && (
+                    <p style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'center', marginTop: '6px' }}>
+                      …y {bulkData.length - 8} más
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  onClick={handleBulkUpload}
+                  disabled={bulkLoading}
+                  className="btn-gold w-full"
+                  style={{ justifyContent: 'center', padding: '12px', marginTop: '12px' }}
+                >
+                  {bulkLoading ? (
+                    <><Loader2 size={14} className="animate-spin" /><span>Subiendo…</span></>
+                  ) : (
+                    <><Upload size={14} /><span>Subir {bulkData.length} producto{bulkData.length > 1 ? 's' : ''} a Supabase</span></>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Resultado */}
+            {bulkResult && bulkResult.success && (
+              <div className="alert-success" style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckCircle2 size={14} /> Se subieron <strong>{bulkResult.count}</strong> productos correctamente.
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* Listado de Productos Existentes */}
