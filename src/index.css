@@ -1394,7 +1394,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* --- ADMIN DASHBOARD --- */
 .admin-section {
-  max-width: 1200px;
+  max-width: 1600px;
+  width: 95%;
   margin: 0 auto;
   padding: 32px 24px;
 }
@@ -1428,7 +1429,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media (min-width: 1024px) {
   .admin-form-panel {
-    grid-column: span 5;
+    grid-column: span 4;
   }
 }
 .admin-list-panel {
@@ -1436,7 +1437,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media (min-width: 1024px) {
   .admin-list-panel {
-    grid-column: span 7;
+    grid-column: span 8;
   }
 }
 .admin-card-box {
@@ -1683,9 +1684,9 @@ h1, h2, h3, h4, h5, h6 {
 .admin-filters-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 20px;
-  padding: 16px;
+  padding: 20px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
@@ -1697,8 +1698,63 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media (min-width: 1024px) {
   .admin-filters-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: 1.2fr 2fr 1fr 1fr 1fr;
   }
+}
+.admin-filters-grid label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.filter-pill-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.filter-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+.filter-pill-btn.active {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+}
+.btn-clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid var(--border-gold);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-clear-filters:hover {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+.btn-clear-filters:active {
+  transform: translateY(0);
 }
 .warning-banner-filters {
   font-size: 11px;
@@ -1714,6 +1770,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 [data-theme='light'] .admin-filters-grid {
   background: rgba(0, 0, 0, 0.02);
+}
+[data-theme='light'] .filter-pill-btn {
+  background: rgba(0, 0, 0, 0.02);
+}
+[data-theme='light'] .filter-pill-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 /* --- FOOTER --- */

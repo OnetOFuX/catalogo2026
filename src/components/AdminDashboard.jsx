@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { supabase } from '../supabaseClient'
-import { Plus, Edit2, Trash2, Upload, Save, X, RefreshCw, AlertTriangle, ArrowLeft, FileJson, Loader2, CheckCircle2, ChevronUp, ChevronDown, GripVertical } from 'lucide-react'
+import { Plus, Edit2, Trash2, Upload, Save, X, RefreshCw, AlertTriangle, ArrowLeft, FileJson, Loader2, CheckCircle2, ChevronUp, ChevronDown, GripVertical, Search, SlidersHorizontal, Calendar, Clock, Tag } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const CATEGORIES = ['Inicial', 'Primaria', 'Secundaria']
@@ -721,10 +721,10 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                     setFilterTimeEnd('')
                     setSortOrder('position')
                   }}
-                  className="back-btn"
-                  style={{ color: 'var(--gold)', fontSize: '11px', padding: '4px 8px', border: '1px solid var(--border-gold)', borderRadius: '4px' }}
+                  className="btn-clear-filters"
                 >
-                  Limpiar Filtros
+                  <X size={12} />
+                  <span>Limpiar Filtros</span>
                 </button>
               )}
             </div>
@@ -732,7 +732,10 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
             {/* Panel de Filtros */}
             <div className="admin-filters-grid">
               <div>
-                <label className="form-label" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Buscar Nombre o ID</label>
+                <label>
+                  <Search size={12} style={{ color: 'var(--gold)' }} />
+                  <span>Buscar Nombre o ID</span>
+                </label>
                 <input
                   type="text"
                   placeholder="Ej. Vidrio o #3"
@@ -744,22 +747,29 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
               </div>
 
               <div>
-                <label className="form-label" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Categoría de Promoción</label>
-                <select
-                  value={filterCategory}
-                  onChange={(e) => setFilterCategory(e.target.value)}
-                  className="form-input cursor-pointer"
-                  style={{ padding: '8px 10px', fontSize: '11px' }}
-                >
-                  <option value="Todos">Todos</option>
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                <label>
+                  <Tag size={12} style={{ color: 'var(--gold)' }} />
+                  <span>Categoría de Promoción</span>
+                </label>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '2px' }}>
+                  {['Todos', ...CATEGORIES].map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setFilterCategory(cat)}
+                      className={`filter-pill-btn ${filterCategory === cat ? 'active' : ''}`}
+                    >
+                      {cat}
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
 
               <div>
-                <label className="form-label" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Fecha de Carga</label>
+                <label>
+                  <Calendar size={12} style={{ color: 'var(--gold)' }} />
+                  <span>Fecha de Carga</span>
+                </label>
                 <input
                   type="date"
                   value={filterDate}
@@ -771,7 +781,10 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 <div>
-                  <label className="form-label" style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px', whiteSpace: 'nowrap' }}>Hora Inicio</label>
+                  <label style={{ whiteSpace: 'nowrap' }}>
+                    <Clock size={10} style={{ color: 'var(--gold)' }} />
+                    <span>Inicio</span>
+                  </label>
                   <input
                     type="time"
                     value={filterTimeStart}
@@ -781,7 +794,10 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                   />
                 </div>
                 <div>
-                  <label className="form-label" style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px', whiteSpace: 'nowrap' }}>Hora Fin</label>
+                  <label style={{ whiteSpace: 'nowrap' }}>
+                    <Clock size={10} style={{ color: 'var(--gold)' }} />
+                    <span>Fin</span>
+                  </label>
                   <input
                     type="time"
                     value={filterTimeEnd}
@@ -793,7 +809,10 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
               </div>
 
               <div>
-                <label className="form-label" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Ordenar por</label>
+                <label>
+                  <SlidersHorizontal size={12} style={{ color: 'var(--gold)' }} />
+                  <span>Ordenar por</span>
+                </label>
                 <select
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value)}
