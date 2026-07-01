@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { supabase } from '../supabaseClient'
-import { KeyRound, Mail, Lock, ArrowLeft, Loader2, Info } from 'lucide-react'
+import { User, Lock, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function AdminLogin({ onBack, onLoginSuccess }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -27,12 +28,8 @@ export default function AdminLogin({ onBack, onLoginSuccess }) {
         email: email.includes('@') ? email : `${email}@gmail.com`,
         password,
       })
-
       if (error) throw error
-
-      if (data?.user) {
-        onLoginSuccess(data.user)
-      }
+      if (data?.user) onLoginSuccess(data.user)
     } catch (err) {
       console.error('Login error:', err)
       setError('Credenciales inválidas. Verifica tus datos.')
@@ -43,43 +40,46 @@ export default function AdminLogin({ onBack, onLoginSuccess }) {
 
   return (
     <div className="login-wrapper">
+      {/* Fondo decorativo */}
+      <div className="login-bg-orb login-bg-orb-1" />
+      <div className="login-bg-orb login-bg-orb-2" />
+
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="login-card"
+        initial={{ opacity: 0, y: 24, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="login-card-modern"
       >
-        <div style={{ height: '3px', background: 'linear-gradient(90deg, transparent, var(--gold), transparent)' }}></div>
-        
-        <div className="login-content">
-          
+        {/* Línea superior dorada */}
+        <div className="login-top-bar" />
+
+        <div className="login-content-modern">
+
           {/* Botón Volver */}
-          <div className="back-btn-row">
-            <button
-              onClick={onBack}
-              className="back-btn"
+          <button onClick={onBack} className="back-btn">
+            <ArrowLeft size={12} />
+            <span>Volver al Catálogo</span>
+          </button>
+
+          {/* Avatar del administrador */}
+          <div className="login-avatar-wrap">
+            <motion.div
+              className="login-avatar"
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
             >
-              <ArrowLeft size={12} />
-              <span>Volver al Catálogo</span>
-            </button>
+              <User size={36} strokeWidth={1.5} />
+              <div className="login-avatar-ring" />
+            </motion.div>
+            <h2 className="login-title-modern">Acceso Administrador</h2>
+            <p className="login-desc-modern">Ingresa tus credenciales para continuar</p>
           </div>
 
-          {/* Icono y Título */}
-          <div className="login-title-row">
-            <div className="login-icon-box">
-              <KeyRound size={20} />
-            </div>
-            <h2 className="login-title">
-              Acceso Administrador
-            </h2>
-            <p className="login-desc">
-              Ingresa tus credenciales para gestionar el catálogo.
-            </p>
-          </div>
-
-          {/* Mensaje de Error */}
+          {/* Error */}
           {error && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               className="alert-error"
             >
@@ -88,70 +88,71 @@ export default function AdminLogin({ onBack, onLoginSuccess }) {
           )}
 
           {/* Formulario */}
-          <form onSubmit={handleLogin}>
-            
-            <div className="login-form-group">
-              <label className="form-label" htmlFor="email">
-                Usuario o Correo
-              </label>
-              <div className="form-input-relative">
-                <Mail size={14} className="form-input-icon" />
+          <form onSubmit={handleLogin} className="login-form-modern">
+
+            {/* Campo usuario */}
+            <div className="lm-field">
+              <div className="lm-input-wrap">
+                <User size={15} className="lm-icon" />
                 <input
                   id="email"
                   type="text"
                   required
-                  placeholder="Usuario o admin@ejemplo.com"
+                  placeholder=" "
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="form-input"
+                  className="lm-input"
+                  autoComplete="username"
                 />
+                <label htmlFor="email" className="lm-label">Usuario o Correo</label>
               </div>
             </div>
 
-            <div className="login-form-group">
-              <label className="form-label" htmlFor="password">
-                Contraseña
-              </label>
-              <div className="form-input-relative">
-                <Lock size={14} className="form-input-icon" />
+            {/* Campo contraseña */}
+            <div className="lm-field">
+              <div className="lm-input-wrap">
+                <Lock size={15} className="lm-icon" />
                 <input
                   id="password"
-                  type="password"
+                  type={showPass ? 'text' : 'password'}
                   required
-                  placeholder="••••••••"
+                  placeholder=" "
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="form-input"
+                  className="lm-input"
+                  autoComplete="current-password"
                 />
+                <label htmlFor="password" className="lm-label">Contraseña</label>
+                <button
+                  type="button"
+                  className="lm-eye-btn"
+                  onClick={() => setShowPass(v => !v)}
+                  tabIndex={-1}
+                >
+                  {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
               </div>
             </div>
 
+            {/* Botón submit */}
             <button
               type="submit"
               disabled={loading}
-              className="btn-gold w-full"
-              style={{ justifyContent: 'center', padding: '12px', marginTop: '12px' }}
+              className="lm-submit-btn"
             >
               {loading ? (
                 <>
-                  <Loader2 size={14} className="animate-spin" />
-                  <span>Autenticando...</span>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Autenticando…</span>
                 </>
               ) : (
-                <span>Iniciar Sesión</span>
+                <>
+                  <User size={16} />
+                  <span>Iniciar Sesión</span>
+                </>
               )}
             </button>
           </form>
-
-          {/* Ayuda de Configuración */}
-          <div style={{ marginTop: '24px', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
-            <div className="detail-award-box" style={{ margin: 0, background: 'var(--bg-primary)' }}>
-              <Info size={16} className="text-gold" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <p className="detail-award-text" style={{ fontSize: '10px' }}>
-                <strong>¿Configurando por primera vez?</strong> Registra a tu administrador en la sección <em>Authentication &gt; Users</em> de tu panel de Supabase.
-              </p>
-            </div>
-          </div>
 
         </div>
       </motion.div>

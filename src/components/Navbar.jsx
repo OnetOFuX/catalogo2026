@@ -1,5 +1,5 @@
 import React from 'react'
-import { GraduationCap, Search, ShoppingCart, Sun, Moon, Lock, LogOut } from 'lucide-react'
+import { GraduationCap, Search, ShoppingCart, Sun, Moon, User, LogOut } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Navbar({
@@ -101,7 +101,15 @@ export default function Navbar({
                 <LogOut size={18} />
               </button>
             </div>
-          ) : null}
+          ) : (
+            <button
+              onClick={onAdminClick}
+              className="icon-btn navbar-admin-btn"
+              title="Acceso Administrador"
+            >
+              <User size={18} />
+            </button>
+          )}
 
         </div>
       </div>
