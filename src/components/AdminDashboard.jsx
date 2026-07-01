@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { supabase } from '../supabaseClient'
 import { Plus, Edit2, Trash2, Upload, Save, X, RefreshCw, AlertTriangle, ArrowLeft, FileJson, Loader2, CheckCircle2, ChevronUp, ChevronDown, GripVertical } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -31,6 +31,115 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
   const [reordering, setReordering] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState(null)
   const [draggedOverIndex, setDraggedOverIndex] = useState(null)
+
+  // Estados de Filtros y Ordenamiento
+  const [filterName, setFilterName] = useState('')
+  const [filterCategory, setFilterCategory] = useState('Todos')
+  const [filterDate, setFilterDate] = useState('')
+  const [filterTimeStart, setFilterTimeStart] = useState('')
+  const [filterTimeEnd, setFilterTimeEnd] = useState('')
+  const [sortOrder, setSortOrder] = useState('position')
+
+  // Formateador de Fecha de Carga
+  const formatLoadDateTime = (dateStr) => {
+    if (!dateStr) return '-'
+    const date = new Date(dateStr)
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    return `${day}/${month}/${year} ${hours}:${minutes}`
+  }
+
+  // Cálculo de identificador de producto tipo ID en orden cronológico
+  const chronologicalIds = useMemo(() => {
+    const sorted = [...products].sort((a, b) => {
+      const dateA = new Date(a.created_at || 0).getTime()
+      const dateB = new Date(b.created_at || 0).getTime()
+      if (dateA !== dateB) return dateA - dateB
+      if (a.position !== b.position) return (a.position || 0) - (b.position || 0)
+      return a.id.localeCompare(b.id)
+    })
+    
+    const idMap = {}
+    sorted.forEach((prod, index) => {
+      idMap[prod.id] = `#${index + 1}`
+    })
+    return idMap
+  }, [products])
+
+  // Filtrado y Ordenación de Productos
+  const filteredAndSortedProducts = useMemo(() => {
+    let result = [...products]
+
+    // 1. Filtrar por nombre, descripción o ID cronológico
+    if (filterName.trim()) {
+      const search = filterName.toLowerCase().trim()
+      result = result.filter((prod) => {
+        const nameMatch = prod.name.toLowerCase().includes(search)
+        const descMatch = (prod.description || '').toLowerCase().includes(search)
+        const idMatch = (chronologicalIds[prod.id] || '').toLowerCase().includes(search)
+        return nameMatch || descMatch || idMatch
+      })
+    }
+
+    // 2. Filtrar por categoría
+    if (filterCategory !== 'Todos') {
+      result = result.filter((prod) => prod.category === filterCategory)
+    }
+
+    // 3. Filtrar por fecha
+    if (filterDate) {
+      result = result.filter((prod) => {
+        if (!prod.created_at) return false
+        const localDate = new Date(prod.created_at)
+        const year = localDate.getFullYear()
+        const month = String(localDate.getMonth() + 1).padStart(2, '0')
+        const day = String(localDate.getDate()).padStart(2, '0')
+        const formattedLocalDate = `${year}-${month}-${day}`
+        return formattedLocalDate === filterDate
+      })
+    }
+
+    // 4. Filtrar por hora de carga (rango)
+    if (filterTimeStart || filterTimeEnd) {
+      result = result.filter((prod) => {
+        if (!prod.created_at) return false
+        const localDate = new Date(prod.created_at)
+        const hours = String(localDate.getHours()).padStart(2, '0')
+        const minutes = String(localDate.getMinutes()).padStart(2, '0')
+        const prodTime = `${hours}:${minutes}`
+
+        if (filterTimeStart && prodTime < filterTimeStart) return false
+        if (filterTimeEnd && prodTime > filterTimeEnd) return false
+        return true
+      })
+    }
+
+    // 5. Ordenamiento
+    if (sortOrder === 'newest') {
+      result.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+    } else if (sortOrder === 'oldest') {
+      result.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0))
+    } else if (sortOrder === 'name') {
+      result.sort((a, b) => a.name.localeCompare(b.name))
+    }
+
+    return result
+  }, [products, filterName, filterCategory, filterDate, filterTimeStart, filterTimeEnd, sortOrder, chronologicalIds])
+
+  // Determinar si hay filtros activos para restringir el reordenamiento manual
+  const isFilterActive = useMemo(() => {
+    return (
+      filterName.trim() !== '' ||
+      filterCategory !== 'Todos' ||
+      filterDate !== '' ||
+      filterTimeStart !== '' ||
+      filterTimeEnd !== '' ||
+      sortOrder !== 'position'
+    )
+  }, [filterName, filterCategory, filterDate, filterTimeStart, filterTimeEnd, sortOrder])
 
   // Manejar cambio de archivo de imagen
   const handleImageChange = (e) => {
@@ -206,7 +315,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
 
   // Funciones de reordenamiento por botones (ChevronUp / ChevronDown)
   const moveUp = (index) => {
-    if (index === 0 || reordering) return
+    if (index === 0 || reordering || isFilterActive) return
     const updated = [...products]
     const temp = updated[index]
     updated[index] = updated[index - 1]
@@ -215,7 +324,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
   }
 
   const moveDown = (index) => {
-    if (index === products.length - 1 || reordering) return
+    if (index === products.length - 1 || reordering || isFilterActive) return
     const updated = [...products]
     const temp = updated[index]
     updated[index] = updated[index + 1]
@@ -225,7 +334,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
 
   // Manejadores de Drag & Drop HTML5
   const handleDragStart = (e, index) => {
-    if (reordering) {
+    if (reordering || isFilterActive) {
       e.preventDefault()
       return
     }
@@ -237,7 +346,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
 
   const handleDragOver = (e, index) => {
     e.preventDefault()
-    if (draggedIndex === null || draggedIndex === index) return
+    if (draggedIndex === null || draggedIndex === index || isFilterActive) return
     setDraggedOverIndex(index)
   }
 
@@ -248,7 +357,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
 
   const handleDrop = async (e, targetIndex) => {
     e.preventDefault()
-    if (draggedIndex === null || draggedIndex === targetIndex || reordering) return
+    if (draggedIndex === null || draggedIndex === targetIndex || reordering || isFilterActive) return
 
     const updated = [...products]
     const [draggedItem] = updated.splice(draggedIndex, 1)
@@ -597,14 +706,124 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         {/* Listado de Productos Existentes */}
         <div className="admin-list-panel">
           <div className="admin-card-box">
-            <h3 className="admin-panel-title">
-              Inventario de Cuadros ({products.length})
-            </h3>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+              <h3 className="admin-panel-title" style={{ margin: 0 }}>
+                Inventario de Cuadros ({filteredAndSortedProducts.length} de {products.length})
+              </h3>
+              {isFilterActive && (
+                <button
+                  onClick={() => {
+                    setFilterName('')
+                    setFilterCategory('Todos')
+                    setFilterDate('')
+                    setFilterTimeStart('')
+                    setFilterTimeEnd('')
+                    setSortOrder('position')
+                  }}
+                  className="back-btn"
+                  style={{ color: 'var(--gold)', fontSize: '11px', padding: '4px 8px', border: '1px solid var(--border-gold)', borderRadius: '4px' }}
+                >
+                  Limpiar Filtros
+                </button>
+              )}
+            </div>
+
+            {/* Panel de Filtros */}
+            <div className="admin-filters-grid">
+              <div>
+                <label className="form-label" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Buscar Nombre o ID</label>
+                <input
+                  type="text"
+                  placeholder="Ej. Vidrio o #3"
+                  value={filterName}
+                  onChange={(e) => setFilterName(e.target.value)}
+                  className="form-input"
+                  style={{ padding: '8px 10px', fontSize: '11px' }}
+                />
+              </div>
+
+              <div>
+                <label className="form-label" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Categoría de Promoción</label>
+                <select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="form-input cursor-pointer"
+                  style={{ padding: '8px 10px', fontSize: '11px' }}
+                >
+                  <option value="Todos">Todos</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Fecha de Carga</label>
+                <input
+                  type="date"
+                  value={filterDate}
+                  onChange={(e) => setFilterDate(e.target.value)}
+                  className="form-input"
+                  style={{ padding: '8px 10px', fontSize: '11px' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div>
+                  <label className="form-label" style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px', whiteSpace: 'nowrap' }}>Hora Inicio</label>
+                  <input
+                    type="time"
+                    value={filterTimeStart}
+                    onChange={(e) => setFilterTimeStart(e.target.value)}
+                    className="form-input"
+                    style={{ padding: '8px 6px', fontSize: '10px', textAlign: 'center' }}
+                  />
+                </div>
+                <div>
+                  <label className="form-label" style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px', whiteSpace: 'nowrap' }}>Hora Fin</label>
+                  <input
+                    type="time"
+                    value={filterTimeEnd}
+                    onChange={(e) => setFilterTimeEnd(e.target.value)}
+                    className="form-input"
+                    style={{ padding: '8px 6px', fontSize: '10px', textAlign: 'center' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="form-label" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Ordenar por</label>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="form-input cursor-pointer"
+                  style={{ padding: '8px 10px', fontSize: '11px' }}
+                >
+                  <option value="position">Orden Personalizado</option>
+                  <option value="newest">Más reciente</option>
+                  <option value="oldest">Más antiguo</option>
+                  <option value="name">Nombre (A-Z)</option>
+                </select>
+              </div>
+            </div>
+
+            {isFilterActive && (
+              <div className="warning-banner-filters">
+                <AlertTriangle size={12} className="text-gold" style={{ flexShrink: 0 }} />
+                <span>El reordenamiento manual (arrastrar) está desactivado mientras haya filtros o un ordenamiento especial activo.</span>
+              </div>
+            )}
 
             {products.length === 0 ? (
               <div className="text-center" style={{ padding: '40px 0' }}>
                 <AlertTriangle size={32} className="text-gold" style={{ opacity: 0.6, marginBottom: '8px' }} />
                 <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No hay cuadros registrados en la base de datos.</p>
+              </div>
+            ) : filteredAndSortedProducts.length === 0 ? (
+              <div className="text-center" style={{ padding: '40px 0' }}>
+                <AlertTriangle size={32} className="text-gold" style={{ opacity: 0.6, marginBottom: '8px' }} />
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Ningún cuadro coincide con los filtros aplicados.</p>
               </div>
             ) : (
               <div className="table-wrapper">
@@ -612,38 +831,40 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                   <thead>
                     <tr>
                       <th style={{ width: '80px', textAlign: 'center' }}>Posición</th>
+                      <th style={{ width: '60px', textAlign: 'center' }}>ID</th>
                       <th>Detalle</th>
                       <th>Categoría</th>
                       <th style={{ textAlign: 'right' }}>Precio</th>
                       <th style={{ textAlign: 'center' }}>Stock</th>
+                      <th>Cargado el</th>
                       <th style={{ textAlign: 'right' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {products.map((prod, index) => (
+                    {filteredAndSortedProducts.map((prod, index) => (
                       <tr 
                         key={prod.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, index)}
-                        onDragOver={(e) => handleDragOver(e, index)}
-                        onDragEnd={handleDragEnd}
-                        onDrop={(e) => handleDrop(e, index)}
-                        className={`reorder-row ${draggedIndex === index ? 'dragging' : ''} ${draggedOverIndex === index ? 'drag-over' : ''}`}
+                        draggable={!isFilterActive}
+                        onDragStart={(e) => !isFilterActive && handleDragStart(e, index)}
+                        onDragOver={(e) => !isFilterActive && handleDragOver(e, index)}
+                        onDragEnd={!isFilterActive ? handleDragEnd : undefined}
+                        onDrop={(e) => !isFilterActive && handleDrop(e, index)}
+                        className={`reorder-row ${!isFilterActive && draggedIndex === index ? 'dragging' : ''} ${!isFilterActive && draggedOverIndex === index ? 'drag-over' : ''} ${isFilterActive ? 'reorder-disabled' : ''}`}
                       >
                         <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                             <span 
                               className="drag-handle-icon" 
-                              title="Arrastra para reordenar"
-                              style={{ cursor: reordering ? 'not-allowed' : 'grab' }}
+                              title={isFilterActive ? "Reordenamiento desactivado con filtros activos" : "Arrastra para reordenar"}
+                              style={{ cursor: (reordering || isFilterActive) ? 'not-allowed' : 'grab', opacity: (reordering || isFilterActive) ? 0.2 : 0.6 }}
                             >
-                              <GripVertical size={13} style={{ opacity: reordering ? 0.3 : 0.6 }} />
+                              <GripVertical size={13} />
                             </span>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                               <button
                                 type="button"
                                 onClick={() => moveUp(index)}
-                                disabled={index === 0 || reordering}
+                                disabled={index === 0 || reordering || isFilterActive}
                                 className="order-arrow-btn"
                                 title="Subir"
                               >
@@ -652,7 +873,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                               <button
                                 type="button"
                                 onClick={() => moveDown(index)}
-                                disabled={index === products.length - 1 || reordering}
+                                disabled={index === filteredAndSortedProducts.length - 1 || reordering || isFilterActive}
                                 className="order-arrow-btn"
                                 title="Bajar"
                               >
@@ -660,6 +881,9 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                               </button>
                             </div>
                           </div>
+                        </td>
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle', fontWeight: '800', color: 'var(--gold)', fontSize: '11px' }}>
+                          {chronologicalIds[prod.id] || '-'}
                         </td>
                         <td>
                           <div className="admin-prod-cell">
@@ -684,6 +908,9 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                         </td>
                         <td style={{ textAlign: 'center', fontWeight: '600' }}>
                           {prod.stock}
+                        </td>
+                        <td style={{ color: 'var(--text-secondary)', fontSize: '10px', whiteSpace: 'nowrap' }}>
+                          {formatLoadDateTime(prod.created_at)}
                         </td>
                         <td>
                           <div className="action-btn-group">
