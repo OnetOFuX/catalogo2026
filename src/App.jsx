@@ -40,6 +40,7 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [zoomImage, setZoomImage] = useState(null)
+  const [showPromo, setShowPromo] = useState(true)
 
   // Persistencia de Carrito, Tema y Vista (Cuadrícula / Lista)
   const [cartItems, setCartItems] = useLocalStorage('promo-cart', [])
@@ -372,6 +373,38 @@ export default function App() {
               </button>
               <img src={zoomImage} alt="Vista ampliada" className="lightbox-img" />
             </div>
+          </motion.div>
+        )}
+
+        {showPromo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="promo-modal-overlay"
+            onClick={() => setShowPromo(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="promo-modal-content"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                className="promo-modal-close-btn" 
+                onClick={() => setShowPromo(false)} 
+                title="Cerrar promoción"
+              >
+                <X size={18} />
+              </button>
+              <img 
+                src={`${import.meta.env.BASE_URL || '/'}promo_banner.png`} 
+                alt="Promoción Especial" 
+                className="promo-modal-img" 
+              />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

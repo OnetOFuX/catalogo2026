@@ -2186,3 +2186,75 @@ textarea.form-input {
   border-color: transparent;
 }
 
+/* Modal de Promoción al Ingresar */
+.promo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 22, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 20px;
+}
+
+.promo-modal-content {
+  position: relative;
+  max-width: 450px;
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  overflow: visible; /* Para que la X pueda sobresalir si es necesario */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-modal-close-btn {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  z-index: 110;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #000;
+  border: 2px solid var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.promo-modal-close-btn:hover {
+  transform: scale(1.1) rotate(90deg);
+  background: var(--gold-light);
+}
+
+.promo-modal-img {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: calc(var(--radius-md) - 2px);
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .promo-modal-content {
+    max-width: 90%;
+  }
+  .promo-modal-close-btn {
+    top: -12px;
+    right: -12px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
