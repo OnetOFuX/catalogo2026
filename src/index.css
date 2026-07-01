@@ -838,6 +838,12 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
+@media (max-width: 768px) {
+  .detail-modal-card {
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+}
 .detail-modal-layout {
   display: grid;
   grid-template-columns: 1fr;
