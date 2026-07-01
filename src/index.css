@@ -2116,3 +2116,67 @@ textarea.form-input {
   transform: scale(1.1);
 }
 
+/* Estilos para Reordenación en la Tabla */
+.reorder-row {
+  cursor: default;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+/* Al arrastrar, mostrar una sombra premium, borde dorado y cierta opacidad */
+.reorder-row.dragging {
+  opacity: 0.5;
+  background: rgba(212, 175, 55, 0.08) !important;
+  border: 1.5px dashed var(--gold);
+}
+
+/* Efecto hover al pasar sobre otra fila para soltar */
+.reorder-row.drag-over {
+  border-top: 2px solid var(--gold);
+  background: rgba(212, 175, 55, 0.05) !important;
+}
+
+/* Icono de arrastre */
+.drag-handle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.drag-handle-icon:hover {
+  color: var(--gold);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Botones de flecha para ordenar */
+.order-arrow-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.order-arrow-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.order-arrow-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  border-color: transparent;
+}
+

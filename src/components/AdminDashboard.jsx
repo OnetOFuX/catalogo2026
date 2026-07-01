@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { supabase } from '../supabaseClient'
-import { Plus, Edit2, Trash2, Upload, Save, X, RefreshCw, AlertTriangle, ArrowLeft, FileJson, Loader2, CheckCircle2 } from 'lucide-react'
+import { Plus, Edit2, Trash2, Upload, Save, X, RefreshCw, AlertTriangle, ArrowLeft, FileJson, Loader2, CheckCircle2, ChevronUp, ChevronDown, GripVertical } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const CATEGORIES = ['Inicial', 'Primaria', 'Secundaria']
@@ -26,6 +26,11 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
   const [bulkFileName, setBulkFileName] = useState('')
   const [bulkLoading, setBulkLoading] = useState(false)
   const [bulkResult, setBulkResult] = useState(null)
+  
+  // Estados para reordenar
+  const [reordering, setReordering] = useState(false)
+  const [draggedIndex, setDraggedIndex] = useState(null)
+  const [draggedOverIndex, setDraggedOverIndex] = useState(null)
 
   // Manejar cambio de archivo de imagen
   const handleImageChange = (e) => {
@@ -107,7 +112,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
       }
 
       if (editingProduct) {
-        // 2a. Actualizar producto existente
+        // 2a. Actualizar producto existente (conservando su posición)
         const { error: updateError } = await supabase.from('products')
           .update(productData)
           .eq('id', editingProduct.id)
@@ -115,9 +120,16 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         if (updateError) throw updateError
         setSuccessMsg('Cuadro de promoción actualizado con éxito.')
       } else {
-        // 2b. Crear nuevo producto
+        // 2b. Crear nuevo producto (colocándolo al final)
+        const maxPosition = products.length > 0
+          ? Math.max(...products.map((p) => p.position || 0), 0)
+          : 0
+        const productWithPos = {
+          ...productData,
+          position: maxPosition + 1
+        }
         const { error: insertError } = await supabase.from('products')
-          .insert([productData])
+          .insert([productWithPos])
 
         if (insertError) throw insertError
         setSuccessMsg('Nuevo cuadro de promoción creado con éxito.')
@@ -154,6 +166,99 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
     }
   }
 
+  // Guardar nuevo orden en base de datos Supabase
+  const saveNewOrder = async (reorderedList) => {
+    setReordering(true)
+    setError(null)
+    setSuccessMsg(null)
+
+    try {
+      // Comparar con el estado actual para actualizar únicamente los registros que cambiaron de posición indexada.
+      // Así minimizamos el tráfico de red y escrituras de base de datos.
+      const updates = []
+      reorderedList.forEach((prod, index) => {
+        if (prod.position !== index) {
+          updates.push({ id: prod.id, position: index })
+        }
+      })
+
+      if (updates.length > 0) {
+        await Promise.all(
+          updates.map(async (u) => {
+            const { error: err } = await supabase
+              .from('products')
+              .update({ position: u.position })
+              .eq('id', u.id)
+            if (err) throw err
+          })
+        )
+      }
+
+      setSuccessMsg('Orden de los cuadros actualizado y sincronizado.')
+      onRefreshProducts()
+    } catch (err) {
+      console.error('Error saving new product order:', err)
+      setError('Error al guardar el nuevo orden: ' + err.message)
+    } finally {
+      setReordering(false)
+    }
+  }
+
+  // Funciones de reordenamiento por botones (ChevronUp / ChevronDown)
+  const moveUp = (index) => {
+    if (index === 0 || reordering) return
+    const updated = [...products]
+    const temp = updated[index]
+    updated[index] = updated[index - 1]
+    updated[index - 1] = temp
+    saveNewOrder(updated)
+  }
+
+  const moveDown = (index) => {
+    if (index === products.length - 1 || reordering) return
+    const updated = [...products]
+    const temp = updated[index]
+    updated[index] = updated[index + 1]
+    updated[index + 1] = temp
+    saveNewOrder(updated)
+  }
+
+  // Manejadores de Drag & Drop HTML5
+  const handleDragStart = (e, index) => {
+    if (reordering) {
+      e.preventDefault()
+      return
+    }
+    setDraggedIndex(index)
+    e.dataTransfer.effectAllowed = 'move'
+    // Firefox compatibility
+    e.dataTransfer.setData('text/html', e.currentTarget)
+  }
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault()
+    if (draggedIndex === null || draggedIndex === index) return
+    setDraggedOverIndex(index)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null)
+    setDraggedOverIndex(null)
+  }
+
+  const handleDrop = async (e, targetIndex) => {
+    e.preventDefault()
+    if (draggedIndex === null || draggedIndex === targetIndex || reordering) return
+
+    const updated = [...products]
+    const [draggedItem] = updated.splice(draggedIndex, 1)
+    updated.splice(targetIndex, 0, draggedItem)
+
+    await saveNewOrder(updated)
+    setDraggedIndex(null)
+    setDraggedOverIndex(null)
+  }
+
   // ─── Carga masiva por JSON ───
   const handleBulkFileChange = (e) => {
     const file = e.target.files[0]
@@ -181,13 +286,18 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
     setBulkResult(null)
 
     try {
-      const rows = bulkData.map((item) => ({
+      const maxPosition = products.length > 0
+        ? Math.max(...products.map((p) => p.position || 0), 0)
+        : 0
+
+      const rows = bulkData.map((item, index) => ({
         name: item.name || item.title || 'Sin nombre',
         description: item.description || '',
         price: parseFloat(item.price) || 0,
         category: item.category || 'Inicial',
         image_url: item.image_url || item.imageUrl || null,
         stock: parseInt(item.stock) || 10,
+        position: maxPosition + 1 + index,
       }))
 
       const { data, error: insertErr } = await supabase
@@ -501,6 +611,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                 <table className="admin-table">
                   <thead>
                     <tr>
+                      <th style={{ width: '80px', textAlign: 'center' }}>Posición</th>
                       <th>Detalle</th>
                       <th>Categoría</th>
                       <th style={{ textAlign: 'right' }}>Precio</th>
@@ -509,8 +620,47 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                     </tr>
                   </thead>
                   <tbody>
-                    {products.map((prod) => (
-                      <tr key={prod.id}>
+                    {products.map((prod, index) => (
+                      <tr 
+                        key={prod.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDragEnd={handleDragEnd}
+                        onDrop={(e) => handleDrop(e, index)}
+                        className={`reorder-row ${draggedIndex === index ? 'dragging' : ''} ${draggedOverIndex === index ? 'drag-over' : ''}`}
+                      >
+                        <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            <span 
+                              className="drag-handle-icon" 
+                              title="Arrastra para reordenar"
+                              style={{ cursor: reordering ? 'not-allowed' : 'grab' }}
+                            >
+                              <GripVertical size={13} style={{ opacity: reordering ? 0.3 : 0.6 }} />
+                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <button
+                                type="button"
+                                onClick={() => moveUp(index)}
+                                disabled={index === 0 || reordering}
+                                className="order-arrow-btn"
+                                title="Subir"
+                              >
+                                <ChevronUp size={12} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveDown(index)}
+                                disabled={index === products.length - 1 || reordering}
+                                className="order-arrow-btn"
+                                title="Bajar"
+                              >
+                                <ChevronDown size={12} />
+                              </button>
+                            </div>
+                          </div>
+                        </td>
                         <td>
                           <div className="admin-prod-cell">
                             <img
