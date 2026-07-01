@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Catalogo2026</title>
+    <script>
+      // GitHub Pages SPA fallback
+      // Redirige cualquier ruta al index.html manteniendo el pathname,
+      // para que el router de React pueda manejar la vista correcta.
+      const prefix = '/catalogo2026'
+      const path = window.location.pathname
+      // Solo redirigir si la ruta empieza con el prefijo del repo
+      const redirect = path.startsWith(prefix) ? path : prefix + path
+      window.location.replace(
+        redirect + window.location.search + window.location.hash
+      )
+    </script>
+  </head>
+  <body></body>
+</html>

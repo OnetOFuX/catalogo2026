@@ -237,13 +237,14 @@ export default function App() {
                     >
                       Ver Modelos
                     </a>
-                    <button
-                      onClick={() => setIsCartOpen(true)}
+                    <a
+                      href="tel:+51987483430"
                       className="btn-outline"
+                      style={{ textDecoration: 'none' }}
                     >
                       <PhoneCall size={12} className="text-gold" />
-                      <span>Coordinar Pedido</span>
-                    </button>
+                      <span>Llamar Ahora</span>
+                    </a>
                   </div>
                 </div>
               </section>

@@ -8,7 +8,7 @@ export default function CartModal({
   cartItems,
   onUpdateQuantity,
   onRemoveItem,
-  whatsappNumber = '+51999888777'
+  whatsappNumber = '+51953200235'
 }) {
   if (!isOpen) return null
 
