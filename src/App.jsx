@@ -17,14 +17,14 @@ export default function App() {
   // Estados de navegación
   const [activeView, setActiveView] = useState('catalog') // 'catalog', 'admin-login', 'admin-dashboard'
   const [user, setUser] = useState(null)
-  
+
   // Estados del Catálogo
   const [products, setProducts] = useState(FALLBACK_PRODUCTS)
   const [loadingProducts, setLoadingProducts] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
-  
+
   // Persistencia de Carrito, Tema y Vista (Cuadrícula / Lista)
   const [cartItems, setCartItems] = useLocalStorage('promo-cart', [])
   const [theme, setTheme] = useLocalStorage('promo-theme', 'dark')
@@ -179,7 +179,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      
+
       {/* Barra de Navegación */}
       <Navbar
         searchTerm={searchTerm}
@@ -199,7 +199,7 @@ export default function App() {
       {/* Vistas Dinámicas */}
       <main style={{ flexGrow: 1 }}>
         <AnimatePresence mode="wait">
-          
+
           {activeView === 'catalog' && (
             <motion.div
               key="catalog-view"
@@ -214,18 +214,18 @@ export default function App() {
                 <div className="hero-decorator">
                   <GraduationCap size={300} />
                 </div>
-                
+
                 <div className="hero-container">
                   <div className="hero-tag">
                     <Sparkles size={11} style={{ marginRight: '4px' }} />
                     <span>Modelos Oficiales de Promoción 2026</span>
                   </div>
-                  
+
                   <h2 className="hero-title">
                     Inmortaliza tu Logro en un <br />
                     <span className="text-gold-gradient font-black">Cuadro de Promoción Premium</span>
                   </h2>
-                  
+
                   <p className="hero-desc">
                     Fabricación exclusiva de cuadros con molduras de madera noble, vidrio templado y grabados personalizados. Cotiza de manera rápida y directa por WhatsApp.
                   </p>
