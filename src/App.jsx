@@ -13,6 +13,21 @@ import { GraduationCap, Sparkles, PhoneCall, Heart, X } from 'lucide-react'
 // Productos Semilla de Respaldo por si Supabase no tiene datos o no está configurado
 const FALLBACK_PRODUCTS = []
 
+// Icono SVG de WhatsApp
+function WhatsAppIcon({ size = 14 }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="currentColor"
+      style={{ flexShrink: 0 }}
+    >
+      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.66.986 3.298 1.448 5.41 1.449 5.428 0 9.847-4.417 9.851-9.845.002-2.63-1.023-5.101-2.887-6.963a9.8 9.8 0 0 0-6.96-2.883C6.6 1.012 2.183 5.43 2.18 10.86c0 2.23.59 3.86 1.48 5.34l-.97 3.543 3.657-.96c.002.001 0 0 0 0zm11.99-6.852c-.3-.15-1.77-.874-2.046-.975-.276-.102-.477-.15-.677.15-.2.3-.777.975-.951 1.176-.176.2-.351.224-.651.075-.3-.15-1.265-.467-2.41-1.487-.893-.797-1.495-1.78-1.67-2.08-.175-.3-.019-.463.13-.612.137-.133.3-.347.45-.52.15-.171.2-.295.3-.49.1-.2.05-.374-.025-.524-.075-.15-.675-1.624-.925-2.224-.244-.589-.493-.51-.678-.519-.176-.009-.376-.01-.576-.01-.2 0-.527.075-.803.374-.276.3-1.053 1.03-1.053 2.512s1.077 2.914 1.227 3.113c.15.2 2.115 3.227 5.126 4.53 3.01.1.758 1.303.743 1.34 1.706.082 1.35.485 1.756.485.405 0 1.77-.724 2.022-1.424.252-.699.252-1.299.176-1.424-.076-.125-.275-.201-.575-.351z" />
+    </svg>
+  );
+}
+
 export default function App() {
   // Estados de navegación
   const [activeView, setActiveView] = useState('catalog') // 'catalog', 'admin-login', 'admin-dashboard'
@@ -238,6 +253,15 @@ export default function App() {
                       className="btn-gold"
                     >
                       Ver Modelos
+                    </a>
+                    <a
+                      href="https://wa.me/51987483430?text=Hola,%20me%20gustaría%20cotizar%20un%20cuadro%20de%20promoción."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-whatsapp"
+                    >
+                      <WhatsAppIcon />
+                      <span>WhatsApp</span>
                     </a>
                     <a
                       href="tel:+51987483430"
