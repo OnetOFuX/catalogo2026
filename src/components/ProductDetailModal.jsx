@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 export default function ProductDetailModal({ product, onClose, onAddToCart, onImageClick }) {
   if (!product) return null
 
-  const { name, description, price, category, image_url, stock } = product
+  const { name, description, price, category, image_url, stock, is_new_model } = product
 
   return (
     <div className="modal-overlay">
@@ -61,6 +61,12 @@ export default function ProductDetailModal({ product, onClose, onAddToCart, onIm
                 <span className="detail-tag detail-tag-category">
                   {category}
                 </span>
+
+                {is_new_model && (
+                  <span className="detail-tag detail-tag-new">
+                    Nuevo Modelo
+                  </span>
+                )}
                 
                 {stock > 0 ? (
                   <span className="detail-tag detail-tag-stock">

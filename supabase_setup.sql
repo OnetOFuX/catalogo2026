@@ -13,7 +13,8 @@ create table if not exists public.products (
   category text not null,
   image_url text,
   stock integer default 10 not null,
-  position integer default 0 not null
+  position integer default 0 not null,
+  is_new_model boolean default false not null
 );
 
 -- 2. Habilitar la seguridad a nivel de fila (Row Level Security - RLS)

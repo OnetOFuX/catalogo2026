@@ -13,6 +13,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
   const [category, setCategory] = useState(CATEGORIES[0])
   const [imageUrl, setImageUrl] = useState('')
   const [stock, setStock] = useState('10')
+  const [isNewModel, setIsNewModel] = useState(false)
   
   // Estados de carga e imagen
   const [imageFile, setImageFile] = useState(null)
@@ -160,6 +161,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
     setCategory(product.category)
     setImageUrl(product.image_url || '')
     setStock(product.stock.toString())
+    setIsNewModel(product.is_new_model || false)
     setImageFile(null)
     setImagePreview(product.image_url || '')
     setError(null)
@@ -175,6 +177,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
     setCategory(CATEGORIES[0])
     setImageUrl('')
     setStock('10')
+    setIsNewModel(false)
     setImageFile(null)
     setImagePreview('')
     setError(null)
@@ -218,6 +221,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         category,
         image_url: finalImageUrl || null,
         stock: parseInt(stock),
+        is_new_model: isNewModel,
       }
 
       if (editingProduct) {
@@ -407,6 +411,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         image_url: item.image_url || item.imageUrl || null,
         stock: parseInt(item.stock) || 10,
         position: maxPosition + 1 + index,
+        is_new_model: item.is_new_model || item.isNewModel || false,
       }))
 
       const { data, error: insertErr } = await supabase
@@ -549,6 +554,25 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
+              </div>
+
+              {/* Casilla Nuevo Modelo */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 0' }}>
+                <input
+                  type="checkbox"
+                  id="is_new_model_checkbox"
+                  checked={isNewModel}
+                  onChange={(e) => setIsNewModel(e.target.checked)}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    accentColor: 'var(--gold)',
+                    cursor: 'pointer'
+                  }}
+                />
+                <label htmlFor="is_new_model_checkbox" className="form-label" style={{ margin: 0, cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  ✨ <span>¿Es Nuevo Modelo? (Etiqueta llamativa de novedad)</span>
+                </label>
               </div>
 
               <div>
@@ -912,7 +936,12 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                               className="admin-prod-thumb"
                             />
                             <div className="admin-prod-name-col">
-                              <span className="admin-prod-name">{prod.name}</span>
+                              <span className="admin-prod-name">
+                                {prod.name}
+                                {prod.is_new_model && (
+                                  <span className="admin-new-model-badge">Nuevo</span>
+                                )}
+                              </span>
                               <span className="admin-prod-desc">{prod.description}</span>
                             </div>
                           </div>

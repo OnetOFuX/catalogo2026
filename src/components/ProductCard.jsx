@@ -3,7 +3,7 @@ import { Plus, Eye, Award } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function ProductCard({ product, onAddToCart, onDetailClick, onImageClick, viewMode = 'grid' }) {
-  const { name, description, price, category, image_url, stock } = product
+  const { name, description, price, category, image_url, stock, is_new_model } = product
   const isList = viewMode === 'list'
 
   return (
@@ -28,6 +28,13 @@ export default function ProductCard({ product, onAddToCart, onDetailClick, onIma
         <span className="card-badge">
           {category}
         </span>
+
+        {/* Novedad "Nuevo Modelo" Badge */}
+        {is_new_model && (
+          <span className="new-model-badge">
+            Nuevo Modelo
+          </span>
+        )}
 
         {/* Decorador de stock bajo */}
         {stock <= 5 && stock > 0 && (
