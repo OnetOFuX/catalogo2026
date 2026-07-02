@@ -1,37 +1,114 @@
 [
   {
-    "name": "Cuadro Clásico Vidrio Templado",
-    "description": "Marco de madera noble con vidrio templado de 4mm. Incluye grabado de nombre y colegio. Tamaño 30x40cm.",
-    "price": 120.00,
-    "category": "Primaria",
+    "name": "Elegancia Piedra Sinterizada Rosada",
+    "description": "Línea Elegancia. Base de madera con acabado estilo piedra sinterizada rosada. Incluye vidrio gratis.",
+    "price": 74.00,
+    "category": "Inicial, Primaria",
+    "stock": 20
+  },
+  {
+    "name": "Elegancia Piedra Sinterizada Azul",
+    "description": "Línea Elegancia. Base de madera con acabado estilo piedra sinterizada azul. Incluye vidrio gratis.",
+    "price": 74.00,
+    "category": "Inicial, Primaria",
+    "stock": 20
+  },
+  {
+    "name": "Mi Princesa Kpop (Línea Brillante)",
+    "description": "Línea Brillante con marco texturizado y diseño temático Kpop. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 65.90,
+    "category": "Inicial",
+    "stock": 35
+  },
+  {
+    "name": "Mi Príncipe Roblox (Línea Brillante)",
+    "description": "Línea Brillante con marco texturizado y diseño temático Roblox. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 65.90,
+    "category": "Inicial",
+    "stock": 35
+  },
+  {
+    "name": "Bella Princesa (Línea Brillante)",
+    "description": "Línea Brillante con marco texturizado y temática de personajes animados. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 65.90,
+    "category": "Inicial, Primaria, Secundaria",
+    "stock": 40
+  },
+  {
+    "name": "Héroe Galaxy (Línea Brillante)",
+    "description": "Línea Brillante con marco texturizado y temática espacial/videojuegos. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 65.90,
+    "category": "Inicial, Primaria, Secundaria",
+    "stock": 40
+  },
+  {
+    "name": "Lila Princesa (Línea Brillante)",
+    "description": "Línea Brillante con acabado lila metalizado texturizado. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 65.90,
+    "category": "Inicial",
+    "stock": 30
+  },
+  {
+    "name": "Azul Príncipe (Línea Brillante)",
+    "description": "Línea Brillante con acabado azul metalizado texturizado. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 65.90,
+    "category": "Inicial",
+    "stock": 30
+  },
+  {
+    "name": "Rosado Perlado (Línea Brillante)",
+    "description": "Línea Brillante con marco en tono rosado perlado texturizado. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 65.90,
+    "category": "Inicial",
     "stock": 25
   },
   {
-    "name": "Cuadro Premium Doble Vidrio",
-    "description": "Doble capa de vidrio con iluminación LED integrada. Grabado láser personalizado. Tamaño 35x45cm.",
-    "price": 180.00,
-    "category": "Secundaria",
-    "stock": 15
+    "name": "Azul Acero (Línea Brillante)",
+    "description": "Línea Brillante con marco en tono azul acero texturizado. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 65.90,
+    "category": "Inicial",
+    "stock": 25
   },
   {
-    "name": "Cuadro Económico MDF",
-    "description": "Marco de MDF resistente con lámina protectora. Ideal para promociones grupales. Tamaño 25x35cm.",
-    "price": 65.00,
-    "category": "Inicial",
+    "name": "Mi Princesa Kpop (Súper Biomadera 3D)",
+    "description": "Línea Súper Biomadera 3D. Estructura calada con elementos decorativos en relieve y juego interactivo al reverso. Incluye vidrio gratis.",
+    "price": 62.00,
+    "category": "Inicial, Primaria",
     "stock": 50
   },
   {
-    "name": "Cuadro Luxe Enchapado en Oro",
-    "description": "Acabado enchapado dorado con cristal antirreflejante. Placa grabada con nombre completo. Tamaño 40x50cm.",
-    "price": 250.00,
-    "category": "Secundaria",
-    "stock": 10
+    "name": "Mi Príncipe Roblox (Súper Biomadera 3D)",
+    "description": "Línea Súper Biomadera 3D. Estructura calada con elementos decorativos en relieve y juego interactivo al reverso. Incluye vidrio gratis.",
+    "price": 62.00,
+    "category": "Inicial, Primaria",
+    "stock": 50
   },
   {
-    "name": "Cuadro Infantil Multicolor",
-    "description": "Diseño colorido para niños. Marco de madera pintada con protector UV. Tamaño 20x30cm.",
-    "price": 85.00,
+    "name": "Mi Dulce Princesa (Súper Biomadera 3D)",
+    "description": "Línea Súper Biomadera 3D. Estructura troquelada temática con relieves decorativos y juego interactivo al reverso. Incluye vidrio gratis.",
+    "price": 62.00,
     "category": "Inicial",
-    "stock": 30
+    "stock": 45
+  },
+  {
+    "name": "Héroe Galaxy (Súper Biomadera 3D)",
+    "description": "Línea Súper Biomadera 3D. Estructura troquelada temática con relieves decorativos y juego interactivo al reverso. Incluye vidrio gratis.",
+    "price": 62.00,
+    "category": "Inicial",
+    "stock": 45
+  },
+  {
+    "name": "Mi Princesa Kpop (Biomadera Brillante 33x45)",
+    "description": "Línea Biomadera Brillante de formato compacto. Tamaño: 33 cm x 45 cm. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 42.00,
+    "category": "Inicial, Primaria",
+    "stock": 60
+  },
+  {
+    "name": "Mi Príncipe Roblox (Biomadera Brillante 33x45)",
+    "description": "Línea Biomadera Brillante de formato compacto. Tamaño: 33 cm x 45 cm. Incluye reverso con juego Trazito Mágico y vidrio gratis.",
+    "price": 42.00,
+    "category": "Primaria, Secundaria",
+    "stock": 60
   }
 ]

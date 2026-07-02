@@ -10,7 +10,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
-  const [category, setCategory] = useState(CATEGORIES[0])
+  const [selectedCategories, setSelectedCategories] = useState([CATEGORIES[0]])
   const [imageUrl, setImageUrl] = useState('')
   const [stock, setStock] = useState('10')
   const [isNewModel, setIsNewModel] = useState(false)
@@ -87,7 +87,11 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
 
     // 2. Filtrar por categoría
     if (filterCategory !== 'Todos') {
-      result = result.filter((prod) => prod.category === filterCategory)
+      result = result.filter((prod) => {
+        if (!prod.category) return false
+        const categories = prod.category.split(',').map((c) => c.trim().toLowerCase())
+        return categories.includes(filterCategory.toLowerCase())
+      })
     }
 
     // 3. Filtrar por fecha
@@ -158,7 +162,10 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
     setName(product.name)
     setDescription(product.description || '')
     setPrice(product.price)
-    setCategory(product.category)
+    const cats = product.category
+      ? product.category.split(',').map(c => c.trim()).filter(Boolean)
+      : [CATEGORIES[0]]
+    setSelectedCategories(cats)
     setImageUrl(product.image_url || '')
     setStock(product.stock.toString())
     setIsNewModel(product.is_new_model || false)
@@ -174,7 +181,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
     setName('')
     setDescription('')
     setPrice('')
-    setCategory(CATEGORIES[0])
+    setSelectedCategories([CATEGORIES[0]])
     setImageUrl('')
     setStock('10')
     setIsNewModel(false)
@@ -189,6 +196,12 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
     setSaving(true)
     setError(null)
     setSuccessMsg(null)
+
+    if (selectedCategories.length === 0) {
+      setError('Debes seleccionar al menos una categoría de promoción.')
+      setSaving(false)
+      return
+    }
 
     try {
       let finalImageUrl = imageUrl
@@ -228,7 +241,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         name,
         description,
         price: parseFloat(price),
-        category,
+        category: selectedCategories.join(', '),
         image_url: finalImageUrl || null,
         stock: parseInt(stock),
         is_new_model: isNewModel,
@@ -416,11 +429,23 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
 
       const rows = bulkData.map((item, index) => {
         const isNew = item.is_new_model || item.isNewModel || false
+        
+        let categoryStr = 'Inicial'
+        if (Array.isArray(item.category)) {
+          categoryStr = item.category.join(', ')
+        } else if (typeof item.category === 'string') {
+          categoryStr = item.category
+        } else if (Array.isArray(item.categories)) {
+          categoryStr = item.categories.join(', ')
+        } else if (typeof item.categories === 'string') {
+          categoryStr = item.categories
+        }
+
         return {
           name: item.name || item.title || 'Sin nombre',
           description: item.description || '',
           price: parseFloat(item.price) || 0,
-          category: item.category || 'Inicial',
+          category: categoryStr,
           image_url: item.image_url || item.imageUrl || null,
           stock: parseInt(item.stock) || 10,
           position: maxPosition + 1 + index,
@@ -559,16 +584,31 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
               </div>
 
               <div>
-                <label className="form-label">Categoría de Promoción</label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="form-input cursor-pointer"
-                >
+                <label className="form-label">Categorías de Promoción</label>
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '6px' }}>
                   {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedCategories.includes(cat)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedCategories([...selectedCategories, cat])
+                          } else {
+                            setSelectedCategories(selectedCategories.filter((c) => c !== cat))
+                          }
+                        }}
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          accentColor: 'var(--gold)',
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <span>{cat}</span>
+                    </label>
                   ))}
-                </select>
+                </div>
               </div>
 
               {/* Casilla Nuevo Modelo */}
@@ -962,9 +1002,13 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
                           </div>
                         </td>
                         <td>
-                          <span className="admin-table-badge">
-                            {prod.category}
-                          </span>
+                          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                            {prod.category ? prod.category.split(',').map(c => c.trim()).filter(Boolean).map(cat => (
+                              <span key={cat} className="admin-table-badge">
+                                {cat}
+                              </span>
+                            )) : <span className="admin-table-badge">-</span>}
+                          </div>
                         </td>
                         <td style={{ textAlign: 'right', fontWeight: '700', color: 'var(--gold)' }}>
                           S/. {Number(prod.price).toFixed(2)}

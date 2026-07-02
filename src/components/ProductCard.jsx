@@ -24,10 +24,14 @@ export default function ProductCard({ product, onAddToCart, onDetailClick, onIma
         {/* Capa gradiente decorativa */}
         <div className="angular-card-overlay"></div>
         
-        {/* Categoría Badge */}
-        <span className="card-badge">
-          {category}
-        </span>
+        {/* Categoría Badges */}
+        <div className="card-badge-container">
+          {category ? category.split(',').map(c => c.trim()).filter(Boolean).map(cat => (
+            <span key={cat} className="card-badge">
+              {cat}
+            </span>
+          )) : null}
+        </div>
 
         {/* Novedad "Nuevo Modelo" Badge */}
         {is_new_model && (

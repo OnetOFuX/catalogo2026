@@ -26,9 +26,11 @@ export default function Catalog({ products, onAddToCart, onDetailClick, onImageC
 
     // 2. Filtrar por categoría
     if (selectedCategory !== 'Todos') {
-      result = result.filter(
-        (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
-      )
+      result = result.filter((p) => {
+        if (!p.category) return false
+        const categories = p.category.split(',').map((c) => c.trim().toLowerCase())
+        return categories.includes(selectedCategory.toLowerCase())
+      })
     }
 
     // 3. Ordenar

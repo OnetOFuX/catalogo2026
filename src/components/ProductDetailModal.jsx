@@ -58,9 +58,11 @@ export default function ProductDetailModal({ product, onClose, onAddToCart, onIm
             {/* Info del Producto */}
             <div>
               <div className="detail-tag-row">
-                <span className="detail-tag detail-tag-category">
-                  {category}
-                </span>
+                {category ? category.split(',').map(c => c.trim()).filter(Boolean).map(cat => (
+                  <span key={cat} className="detail-tag detail-tag-category">
+                    {cat}
+                  </span>
+                )) : null}
 
                 {is_new_model && (
                   <span className="detail-tag detail-tag-new">
