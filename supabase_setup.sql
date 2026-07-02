@@ -14,7 +14,8 @@ create table if not exists public.products (
   image_url text,
   stock integer default 10 not null,
   position integer default 0 not null,
-  is_new_model boolean default false not null
+  is_new_model boolean default false not null,
+  marked_new_at timestamp with time zone
 );
 
 -- 2. Habilitar la seguridad a nivel de fila (Row Level Security - RLS)

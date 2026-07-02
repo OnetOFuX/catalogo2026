@@ -38,6 +38,24 @@ export default function Catalog({ products, onAddToCart, onDetailClick, onImageC
       result.sort((a, b) => Number(b.price) - Number(a.price))
     } else if (sortBy === 'name-asc') {
       result.sort((a, b) => a.name.localeCompare(b.name))
+    } else {
+      // Orden por defecto: "featured" (Destacados)
+      result.sort((a, b) => {
+        // 1. Nuevos modelos primero (is_new_model: true)
+        const aNew = a.is_new_model ? 1 : 0
+        const bNew = b.is_new_model ? 1 : 0
+        if (aNew !== bNew) return bNew - aNew
+
+        // 2. Si ambos son nuevos modelos, ordenar por fecha de marcado descendente (el más nuevo primero)
+        if (a.is_new_model && b.is_new_model) {
+          const aTime = new Date(a.marked_new_at || a.created_at || 0).getTime()
+          const bTime = new Date(b.marked_new_at || b.created_at || 0).getTime()
+          if (aTime !== bTime) return bTime - aTime
+        }
+
+        // 3. Si no son nuevos, ordenar por su orden personalizado (posición ascendente)
+        return (a.position || 0) - (b.position || 0)
+      })
     }
 
     return result

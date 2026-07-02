@@ -213,6 +213,16 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         finalImageUrl = data.publicUrl
       }
 
+      // Determinar la fecha de marcado de nuevo modelo
+      let markedNewAt = null
+      if (isNewModel) {
+        if (editingProduct && editingProduct.is_new_model && editingProduct.marked_new_at) {
+          markedNewAt = editingProduct.marked_new_at
+        } else {
+          markedNewAt = new Date().toISOString()
+        }
+      }
+
       // Validar datos básicos
       const productData = {
         name,
@@ -222,6 +232,7 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         image_url: finalImageUrl || null,
         stock: parseInt(stock),
         is_new_model: isNewModel,
+        marked_new_at: markedNewAt,
       }
 
       if (editingProduct) {
@@ -403,16 +414,20 @@ export default function AdminDashboard({ products, onRefreshProducts, onBack }) 
         ? Math.max(...products.map((p) => p.position || 0), 0)
         : 0
 
-      const rows = bulkData.map((item, index) => ({
-        name: item.name || item.title || 'Sin nombre',
-        description: item.description || '',
-        price: parseFloat(item.price) || 0,
-        category: item.category || 'Inicial',
-        image_url: item.image_url || item.imageUrl || null,
-        stock: parseInt(item.stock) || 10,
-        position: maxPosition + 1 + index,
-        is_new_model: item.is_new_model || item.isNewModel || false,
-      }))
+      const rows = bulkData.map((item, index) => {
+        const isNew = item.is_new_model || item.isNewModel || false
+        return {
+          name: item.name || item.title || 'Sin nombre',
+          description: item.description || '',
+          price: parseFloat(item.price) || 0,
+          category: item.category || 'Inicial',
+          image_url: item.image_url || item.imageUrl || null,
+          stock: parseInt(item.stock) || 10,
+          position: maxPosition + 1 + index,
+          is_new_model: isNew,
+          marked_new_at: isNew ? new Date().toISOString() : null,
+        }
+      })
 
       const { data, error: insertErr } = await supabase
         .from('products')
